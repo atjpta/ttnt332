@@ -100,6 +100,7 @@ class Candidate(object):
 
     # hàm tính fitness của đối tượng đang xét
     # sẽ xác định dựa trên các ràng buộc của bài toán
+
     def updateFitness(self):
 
         # khởi tạo mảng 9 phần tự để đếm số số giá trị trùng, giá trị ban đầu bằng 0
@@ -112,8 +113,6 @@ class Candidate(object):
 
         # i chạy qua các cột có giá trị từ 0 - (NumDigits - 1)
         # để tính ra giá trị colmnSum
-        # i là cột
-        # j là hàng
         for i in range(0, NumDigits):
 
             # khởi tạo biến dò khác không
@@ -140,7 +139,7 @@ class Candidate(object):
                     nonzero += 1
             # nếu đúng thì nonzero/NumDigits = 1
             nonzero = nonzero/NumDigits
-            columnSum = (columnSum + nonzero)
+            columnSum += nonzero
             # khởi tão lại columnCount và chạy tiếp cột tiếp theo
             columnCount = numpy.zeros(NumDigits, dtype=int)
 
@@ -194,9 +193,11 @@ class Candidate(object):
         # nếu cả 3 ràng buộc đều = 1 thì cá thế đó chính là cá thể cần tìm
         if (int(columnSum) == 1 and int(blockSum) == 1 and rowSum == 1):
             fitness = 1.0
+
         # ngược lại sẽ tính ra fitness để đánh giá đem đi lai ghép, ... tạo ra thế hệ kế tiếp
         else:
-            fitness = (rowSum * blockSum * columnSum)
+
+            fitness = (rowSum + blockSum + columnSum)/3
 
         self.fitness = fitness
         return
