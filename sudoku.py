@@ -2,7 +2,7 @@ import numpy
 import random
 random.seed()
 
-#  số chữ số
+#  kích thước ma trận
 NumDigits = 9
 
 
@@ -15,7 +15,8 @@ class Population(object):
         self.candidates = []
         return
 
-    def seed(self, Nc, given):
+    # khởi tạo cá thể
+    def seed(self, size, original_Comparison):
         self.candidates = []
         # Xác định các giá trị có thể có mà mỗi ô vuông có thể nhận
         helper = Candidate()
@@ -24,17 +25,17 @@ class Population(object):
         for row in range(0, NumDigits):
             for column in range(0, NumDigits):
                 for value in range(1, 10):
-                    if((given.values[row][column] == 0) and not (given.isColumnDuplicate(column, value) or given.isBlockDuplicate(row, column, value) or given.isRowDuplicate(row, value))):
+                    if((original_Comparison.values[row][column] == 0) and not (original_Comparison.isColumnDuplicate(column, value) or original_Comparison.isBlockDuplicate(row, column, value) or original_Comparison.isRowDuplicate(row, value))):
                         # Giá trị đã tồn tại.
                         helper.values[row][column].append(value)
-                    elif(given.values[row][column] != 0):
+                    elif(original_Comparison.values[row][column] != 0):
                         # Trùng giá trị của đề bài
                         helper.values[row][column].append(
-                            given.values[row][column])
+                            original_Comparison.values[row][column])
                         break
 
         # Nhân giống một quần thể mới.
-        for p in range(0, Nc):
+        for p in range(0, size):
             g = Candidate()
             for i in range(0, NumDigits):  # Hàng mới trong ứng cử viên.
                 row = numpy.zeros(NumDigits, dtype=int)
@@ -44,17 +45,17 @@ class Population(object):
                 for j in range(0, NumDigits):
 
                     # Nếu giá trị đã được đưa ra, đừng thay đổi nó.
-                    if(given.values[i][j] != 0):
-                        row[j] = given.values[i][j]
+                    if(original_Comparison.values[i][j] != 0):
+                        row[j] = original_Comparison.values[i][j]
                     # Điền vào khoảng trống bằng bảng trợ giúp.
-                    elif(given.values[i][j] == 0):
+                    elif(original_Comparison.values[i][j] == 0):
                         row[j] = helper.values[i][j][random.randint(
                             0, len(helper.values[i][j])-1)]
 
                 # Nếu chúng tôi không có bảng hợp lệ, hãy thử lại. Không được có bản sao trong hàng.
                 while(len(list(set(row))) != NumDigits):
                     for j in range(0, NumDigits):
-                        if(given.values[i][j] == 0):
+                        if(original_Comparison.values[i][j] == 0):
                             row[j] = helper.values[i][j][random.randint(
                                 0, len(helper.values[i][j])-1)]
 
@@ -97,7 +98,7 @@ class Candidate(object):
         self.fitness = None
         return
 
-    # hàm tính fitness
+    # hàm tính fitness của đối tượng đang xét
     # sẽ xác định dựa trên các ràng buộc của bài toán
     def updateFitness(self):
 
@@ -111,9 +112,12 @@ class Candidate(object):
 
         # i chạy qua các cột có giá trị từ 0 - (NumDigits - 1)
         # để tính ra giá trị colmnSum
+        # i là cột
+        # j là hàng
         for i in range(0, NumDigits):
 
             # khởi tạo biến dò khác không
+            # nếu = 0 thì biến sẽ tăng lên 1
             nonzero = 0
 
             # j chạy qua các hàng, có giá trị từ 0 - (NumDigits - 1)
@@ -199,7 +203,7 @@ class Candidate(object):
 
     # đột biến
     # trong phần này, ta sẽ chọn ra 1 hàng và hoán đổi 2 giá trị với nhau của hàng đó
-    def mutate(self, mutationRate, given):
+    def mutate(self, mutationRate, original_Comparison):
 
         # random.uniform() cho ra số float
         r = random.uniform(0, 1.1)
@@ -223,12 +227,12 @@ class Candidate(object):
                     toColumn = random.randint(0, 8)
 
                 # kiểm tra xem 2 vị trí có trống không (khác vị trí của đề bài)
-                if(given.values[row][fromColumn] == 0 and given.values[row][toColumn] == 0):
+                if(original_Comparison.values[row][fromColumn] == 0 and original_Comparison.values[row][toColumn] == 0):
                     # kiểm tra xem giá trị khi hoán đổi có làm cho bị trùng giá trị không
-                    if(not given.isColumnDuplicate(toColumn, self.values[row][fromColumn])
-                       and not given.isColumnDuplicate(fromColumn, self.values[row][toColumn])
-                       and not given.isBlockDuplicate(row, toColumn, self.values[row][fromColumn])
-                       and not given.isBlockDuplicate(row, fromColumn, self.values[row][toColumn])):
+                    if(not original_Comparison.isColumnDuplicate(toColumn, self.values[row][fromColumn])
+                       and not original_Comparison.isColumnDuplicate(fromColumn, self.values[row][toColumn])
+                       and not original_Comparison.isBlockDuplicate(row, toColumn, self.values[row][fromColumn])
+                       and not original_Comparison.isBlockDuplicate(row, fromColumn, self.values[row][toColumn])):
 
                         # hoán đổi 2 giá trị
                         temp = self.values[row][toColumn]
@@ -240,7 +244,7 @@ class Candidate(object):
 
 
 # class chứa ma trận đề bài để kiểm tra xem lúc đột biến có bị trùng hay không
-class Given(Candidate):
+class originalComparison(Candidate):
 
     def __init__(self, values):
         self.values = values
@@ -279,9 +283,9 @@ class Given(Candidate):
             return False
 
 
-# class Tournament, cho ra 2 cá thể để lai ghép với nhau
-class Tournament(object):
-    """ The crossover function requires two parents to be selected from the population pool. The Tournament class is used to do this.
+# class choiceParents, cho ra 2 cá thể để lai ghép với nhau
+class choiceParents(object):
+    """ The crossover function requires two parents to be selected from the population pool. The choiceParents class is used to do this.
 
     Two individuals are selected from the population pool and a random number in [0, 1] is chosen. If this number is less than the 'selection rate' (e.g. 0.85), then the fitter individual is selected; otherwise, the weaker one is selected.
     """
@@ -430,14 +434,14 @@ class CycleCrossover(object):
 
 class Sudoku(object):
     def __init__(self):
-        self.given = None
+        self.original_Comparison = None
         return
 
     def load(self, path):
         # Load a file containing SUDOKU to solve.
         with open(path, "r") as f:
             values = numpy.loadtxt(f).astype(int)
-            self.given = Given(values)
+            self.original_Comparison = originalComparison(values)
         print("INPUT\n", values)
         return
 
@@ -450,10 +454,10 @@ class Sudoku(object):
 
     # hàm xử lý
     def solve(self):
-        Nc = 200  # kích thước quần thể
-        Ne = int(0.6*Nc)  # số lượng cá thể ưu tú được giữ lại = 120
-        Ng = 999  # số thế hệ của quần thể
-        Nm = 0  # đểm số lượng đột biến
+        size = 200  # kích thước quần thể
+        sizeElite = int(0.6*size)  # số lượng cá thể ưu tú được giữ lại = 120
+        NumGeneration = 999  # số thế hệ của quần thể
+        NumMutate = 0  # đểm số lượng đột biến
         staleCount = 0  # đếm số thế hệ trong 1 vùng đã chọn
         prevFitness = 0
 
@@ -464,17 +468,17 @@ class Sudoku(object):
 
         # quần thể ban đầu or tạo ra giống mới
         self.population = Population()
-        self.population.seed(Nc, self.given)
+        self.population.seed(size, self.original_Comparison)
 
         # cho phép lặp 1000 thế hệ
-        for generation in range(0, Ng):
+        for generation in range(0, NumGeneration):
             print("Generation %d" % generation)
 
             # kiểm tra giải pháp
             bestFitness = 0.0
-            bestSolution = self.given
+            bestSolution = self.original_Comparison
             # cho mỗi thế hệ, duyệt qua tất cả các ứng cử viên hoặc nhiễm sắc thể để kiểm tra giải pháp
-            for c in range(0, Nc):
+            for c in range(0, size):
                 fitness = self.population.candidates[c].fitness
                 if(int(fitness) == 1):
                     print("Solution found at generation %d!" % generation)
@@ -495,15 +499,15 @@ class Sudoku(object):
             # 0.6*200=120 elites in new generation
             self.population.sort()
             elites = []
-            for e in range(0, Ne):
+            for e in range(0, sizeElite):
                 elite = Candidate()
                 elite.values = numpy.copy(self.population.candidates[e].values)
                 elites.append(elite)
 
             # Tạo phần còn lại của các ứng cử viên. 80 trẻ em, vì vậy chạy vòng lặp 40 lần
-            for count in range(Ne, Nc, 2):
+            for count in range(sizeElite, size, 2):
                 # Chọn cha mẹ từ dân số thông qua a tournament.
-                t = Tournament()
+                t = choiceParents()
                 parent1 = t.compete(self.population.candidates)
                 parent2 = t.compete(self.population.candidates)
 
@@ -515,10 +519,10 @@ class Sudoku(object):
                 # đột biến child1.
                 child1.updateFitness()
                 oldFitness = child1.fitness
-                success = child1.mutate(mutationRate, self.given)
+                success = child1.mutate(mutationRate, self.original_Comparison)
                 child1.updateFitness()
                 if(success):
-                    Nm += 1
+                    NumMutate += 1
                     # Được sử dụng để tính toán tỷ lệ thành công tương đối của các đột biến.
                     if(child1.fitness > oldFitness):
                         phi = phi + 1
@@ -526,10 +530,10 @@ class Sudoku(object):
                 # đột biến child2.
                 child2.updateFitness()
                 oldFitness = child2.fitness
-                success = child2.mutate(mutationRate, self.given)
+                success = child2.mutate(mutationRate, self.original_Comparison)
                 child2.updateFitness()
                 if(success):
-                    Nm += 1
+                    NumMutate += 1
                     # Được sử dụng để tính toán tỷ lệ thành công tương đối của các đột biến.
                     if(child2.fitness > oldFitness):
                         phi = phi + 1
@@ -539,7 +543,7 @@ class Sudoku(object):
                 nextPopulation.append(child2)
 
             # Thêm giới tinh hoa vào phần cuối của dân số. Chúng sẽ không bị ảnh hưởng bởi sự trao đổi chéo hoặc đột biến.
-            for e in range(0, Ne):
+            for e in range(0, sizeElite):
                 nextPopulation.append(elites[e])
 
             # Chọn thế hệ tiếp theo.
@@ -547,10 +551,10 @@ class Sudoku(object):
             self.population.updateFitness()
 
             # Tính tỷ lệ đột biến thích nghi mới (dựa trên quy tắc thành công 1/5 của Rechenberg). Điều này nhằm ngăn chặn quá nhiều đột biến khi thể lực tiến dần đến sự thống nhất.
-            if(Nm == 0):
+            if(NumMutate == 0):
                 phi = 0  # Avoid divide by zero.
             else:
-                phi = phi / Nm
+                phi = phi / NumMutate
 
             if(phi > 0.2):
                 sigma = sigma*0.998  # sigma giảm, ít đột biến hơn
@@ -579,7 +583,7 @@ class Sudoku(object):
             # Gieo hạt lại quần thể nếu 100 thế hệ đã qua mà hai ứng viên khỏe nhất luôn có cùng thể trạng.(không thể tạo ra cá thể khác biệt trong quần thể)
             if(staleCount >= 100):
                 print("Dân số đã trở nên cũ kỹ. Đang làm mới dân số lại ...")
-                self.population.seed(Nc, self.given)
+                self.population.seed(size, self.original_Comparison)
                 staleCount = 0
                 sigma = 1
                 phi = 0

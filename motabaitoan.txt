@@ -22,10 +22,10 @@ Tổng quan về các lớp trong bài toán:
 3. lớp Candidate
     - lớp này sẽ chứa các hàm hiện quan đến 1 cá thể đang xét tới
 
-4. lớp Given
+4. lớp originalComparison
     - lớp này sẽ so sánh các cá thể khi biến đổi trạng thái có bị trùng với trạng thái ban đầu hay không
 
-5. lớp Tournament 
+5. lớp choiceParents 
     - lớp này sẽ chọn ra 2 cá thể để lai với nhau
 
 6. lớp CycleCrossover
