@@ -1,0 +1,13 @@
+1. self
+- self là tham số đầu tiên trong 1 hàm(có thể đặt thành từ khác)
+- nó tương tự như từ khóa this trong các ngôn ngữ hướng đối tượng khác
+- self không phải là từ khóa trong py
+- các từ khóa tự đặt và sử dụng sau "self." sẽ thành thuộc tính của class
+2. def
+- là từ khóa để py nhận biết chúng ta đang viết 1 hàm
+
+3. def __init__(self):
+- là hàm xây dụng trong py
+
+4. mảng 2 chiều
+- truy xuất 1 giá trị tại 1 vị trí cụ thể:  A[vị trí hàng][vị trí cột] 
