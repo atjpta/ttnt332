@@ -1,13 +1,22 @@
 1. self
-- self là tham số đầu tiên trong 1 hàm(có thể đặt thành từ khác)
-- nó tương tự như từ khóa this trong các ngôn ngữ hướng đối tượng khác
-- self không phải là từ khóa trong py
-- các từ khóa tự đặt và sử dụng sau "self." sẽ thành thuộc tính của class
+    - self là tham số đầu tiên trong 1 hàm(có thể đặt thành từ khác)
+    - nó tương tự như từ khóa this trong các ngôn ngữ hướng đối tượng khác
+    - self không phải là từ khóa trong py
+    - các từ khóa tự đặt và sử dụng sau "self." sẽ thành thuộc tính của class
 2. def
-- là từ khóa để py nhận biết chúng ta đang viết 1 hàm
+    - là từ khóa để py nhận biết chúng ta đang viết 1 hàm
 
 3. def __init__(self):
-- là hàm xây dụng trong py
+    - là hàm xây dụng trong py
 
 4. mảng 2 chiều
-- truy xuất 1 giá trị tại 1 vị trí cụ thể:  A[vị trí hàng][vị trí cột] 
+    - truy xuất 1 giá trị tại 1 vị trí cụ thể:  A[vị trí hàng][vị trí cột] 
+
+5. cách tìm hiểu source code
+    - giống như cách hàm đệ quy hoạt động.
+    - đầu tiên ta đi tìm hiểu code chương trình chính
+    - sau đó khi chương trình gọi 1 lớp nào mới thì ta đi tìm hiểu class đó cùng các hàm, thuộc tính bên trong nó
+    - nếu trong class đó gọi class nào mới thì ta cứ tiếp tục đi tìm hiểu class đó như bước ở trên 
+    - sau khi tìm hiểu xong ta quay lại class trước đó và tìm hiểu tiếp tục 
+    - cứ lặp đi lặp lại các bước trên cho đến khi hết chương trình
+--> tóm lại là phải tìm hiểu các class ở mức cơ bản nhất rồi mới tới các mức cao hơn

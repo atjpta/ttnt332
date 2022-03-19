@@ -244,14 +244,18 @@ class Candidate(object):
         return success
 
 
-# class chứa ma trận đề bài để kiểm tra xem lúc đột biến có bị trùng hay không
+# class chứa ma trận đề bài để kiểm tra xem có bị trùng hay không
+# được kế thừa từ class Candidate nên sẽ có các hàm và các thuộc tính như Candidate
 class originalComparison(Candidate):
 
+    # lúc này khởi tạo cần truyền giá trị vào ( ở đây là ma trận đề bài 9x9 )
     def __init__(self, values):
         self.values = values
         return
 
-    # kiểm tra xem giá trị có bị trùng trong hàng không
+    # kiểm tra xem giá trị được truền vào có bị trùng trong hàng không
+    # nếu trùng với giá trị đang xét trùng với đề bài thì sẽ trả về true
+    # ngược lại nếu giá trị đang xét trùng với đề bài thì sẽ trả về false
     def isRowDuplicate(self, row, value):
         for column in range(0, NumDigits):
             if(self.values[row][column] == value):
@@ -295,13 +299,13 @@ class choiceParents(object):
         return
 
     def compete(self, candidates):
-        """ Pick 2 random candidates from the population and get them to compete against each other. """
+        # chọn ra 2 cá thể ngẫu nhiên và để họ cạnh trang với nhau
         c1 = candidates[random.randint(0, len(candidates)-1)]
         c2 = candidates[random.randint(0, len(candidates)-1)]
         f1 = c1.fitness
         f2 = c2.fitness
 
-        # Find the fittest and the weakest.
+        # tìm ra cá thể có chỉ số fitness cao và thấp
         if(f1 > f2):
             fittest = c1
             weakest = c2
@@ -310,6 +314,8 @@ class choiceParents(object):
             weakest = c1
 
         selection_rate = 0.85
+        # nếu mà r > 0.85 thì cá thể có chỉ số fitness cao sẽ được chọn
+        # ngược lại r < 0.85 thì cả thể có chỉ số fitness thấp sẽ được chọn
         r = random.uniform(0, 1.1)
         while(r > 1):
             r = random.uniform(0, 1.1)

@@ -30,3 +30,34 @@ Tổng quan về các lớp trong bài toán:
 
 6. lớp CycleCrossover
     - lớp này sẽ chứa các phép lai để tạo ra các thế hệ kế tiếp
+
+
+yêu cầu để tìm hiểu bài toán
+1. lớp Candidate
+    - hiểu được các thuộc tính của class và các hàm
+    - hiểu được cách xử lý mảng 2 chiều
+    - hiểu được cách tính tìm chỉ số fitness cho cá thể đang xét tới
+        + trong phần ct tính chỉ số fitness có nhiều cách để tính. 
+        + phải đảm bảo được chỉ số fitness là 1 hàm tuyến tính tăng dần
+    - hiểu được cách đột biến của 1 cá thể
+        + trong phần đột biến này, có nhiều cách đột biến khác nhau
+        + phải viết được các cách đột biến khác nhau 
+
+2. lớp originalComparison
+    - hiểu được cách so sánh giá trị đang xét có trùng với đề bài hay không 
+
+3. lớp choiceParents
+    - hiểu được cách lựa chọn cá thể làm bố or mẹ
+        + có nhiều kiểu chọn khác nhau
+        + phải viết được các cách chọn khác
+
+4. lớp CycleCrossover
+    - hiểu được cách lại 2 cá thể lại với nhau cho ra đời 1 thế hệ kế tiếp
+        + có nhiều kiểu lai ghép với nhau
+        + phải viết được các cách lai khác nhau
+5. lớp Population
+    - hiểu được cách tạo ra 1 quần thể
+
+6. lớp sudoku
+    - hiểu được cách hoạt động của lớp để xử lý bài toán sudoku
+     
