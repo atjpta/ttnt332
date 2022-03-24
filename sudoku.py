@@ -15,23 +15,26 @@ class Population(object):
         self.candidates = []
         return
 
-    # khởi tạo cá thể
+    # khởi tạo quần thể mới
     def seed(self, size, original_Comparison):
         self.candidates = []
         # Xác định các giá trị có thể có mà mỗi ô vuông có thể nhận
+        #sườn ban đầu của quần thể
         helper = Candidate()
         helper.values = [[[] for j in range(0, NumDigits)]
                          for i in range(0, NumDigits)]
         for row in range(0, NumDigits):
             for column in range(0, NumDigits):
                 for value in range(1, 10):
-                    if((original_Comparison.values[row][column] == 0) and not (original_Comparison.isColumnDuplicate(column, value) or original_Comparison.isBlockDuplicate(row, column, value) or original_Comparison.isRowDuplicate(row, value))):
-                        # Giá trị đã tồn tại.
+                    if((original_Comparison.values[row][column] == 0)
+                        and (not (original_Comparison.isColumnDuplicate(column, value)
+                                or original_Comparison.isBlockDuplicate(row, column, value)
+                                or original_Comparison.isRowDuplicate(row, value)))):
+                        # Giá trị có thể thêm
                         helper.values[row][column].append(value)
                     elif(original_Comparison.values[row][column] != 0):
                         # Trùng giá trị của đề bài
-                        helper.values[row][column].append(
-                            original_Comparison.values[row][column])
+                        helper.values[row][column].append(original_Comparison.values[row][column])
                         break
 
         # Nhân giống một quần thể mới.
@@ -40,7 +43,7 @@ class Population(object):
             for i in range(0, NumDigits):  # Hàng mới trong ứng cử viên.
                 row = numpy.zeros(NumDigits, dtype=int)
 
-                # điền vào givens.
+                # điền vào originalComparison.
                 # Giá trị cột j mới trong hàng i.
                 for j in range(0, NumDigits):
 
@@ -49,9 +52,7 @@ class Population(object):
                         row[j] = original_Comparison.values[i][j]
                     # Điền vào khoảng trống bằng bảng trợ giúp.
                     elif(original_Comparison.values[i][j] == 0):
-                        row[j] = helper.values[i][j][random.randint(
-                            0, len(helper.values[i][j])-1)]
-
+                        row[j] = helper.values[i][j][random.randint(0, len(helper.values[i][j])-1)]
                 # Nếu chúng tôi không có bảng hợp lệ, hãy thử lại. Không được có bản sao trong hàng.
                 while(len(list(set(row))) != NumDigits):
                     for j in range(0, NumDigits):
@@ -64,12 +65,12 @@ class Population(object):
             self.candidates.append(g)
 
         # Tính toán Fitness của tất cả các ứng cử viên trong dân số.
-        self.updateFitness()
+        self.updateFitnessAll()
         print("Seeding complete.")
         return
 
     # Cập nhật Fitness của mọi ứng cử viên / nhiễm sắc thể
-    def updateFitness(self):
+    def updateFitnessAll(self):
         for candidate in self.candidates:
             candidate.updateFitness()
         return
@@ -127,7 +128,7 @@ class Candidate(object):
                 # nếu có giá trị nào trùng vị ở vị trí đó trong columnCount tăng lên 1
                 columnCount[self.values[j][i]-1] += 1
 
-            #columnSum = columnSum + (1/len(set(columnCount)))/NumDigits
+            # columnSum = columnSum + (1/len(set(columnCount)))/NumDigits
 
             # tính giá trị columnSum
             # for cho k chạy từ 0 -> (NumDigits - 1)
@@ -153,7 +154,7 @@ class Candidate(object):
                 # chú ý vị trí của ma trận
                 rowCount[self.values[i][j]-1] += 1
 
-            #rowSum = rowSum + (1/len(set(rowCount)))/NumDigits
+            # rowSum = rowSum + (1/len(set(rowCount)))/NumDigits
             for k in range(0, NumDigits):
                 if rowCount[k] != 0:
                     nonzero += 1
@@ -180,7 +181,7 @@ class Candidate(object):
                 blockCount[self.values[i+2][j+1]-1] += 1
                 blockCount[self.values[i+2][j+2]-1] += 1
 
-                #blockSum = blockSum + (1/len(set(blockCount)))/NumDigits
+                # blockSum = blockSum + (1/len(set(blockCount)))/NumDigits
                 nonzero = 0
                 for k in range(0, NumDigits):
                     if blockCount[k] != 0:
@@ -207,17 +208,19 @@ class Candidate(object):
     def mutate(self, mutationRate, original_Comparison):
 
         # random.uniform() cho ra số float
-        r = random.uniform(0, 1.1)
-        # lấy ra giá trị r > 1
-        while(r > 1):
-            r = random.uniform(0, 1.1)
+        r = random.uniform(0, 1)
+        # while dùng để lấy ra giá trị r <= 1
+        # while(r > 1):
+        #     r = random.uniform(0, 1.1)
 
         # khởi tạo biến thành công, mặc định đang là sai
         success = False
+
         # bắt đầu đi đột biến
         if (r < mutationRate):
             while(not success):
                 # random.randint trả về số nguyên
+                # random hàng
                 row = random.randint(0, 8)
 
                 # tìm 2 cột khác nhau
@@ -241,6 +244,12 @@ class Candidate(object):
                         self.values[row][fromColumn] = temp
                         success = True
 
+                        # # khong đột biến
+                        # temp = self.values[row][toColumn]
+                        # self.values[row][toColumn] = temp
+                        # self.values[row][fromColumn] = self.values[row][fromColumn]
+                        # success = True
+
         return success
 
 
@@ -255,7 +264,8 @@ class originalComparison(Candidate):
 
     # kiểm tra xem giá trị được truền vào có bị trùng trong hàng không
     # nếu trùng với giá trị đang xét trùng với đề bài thì sẽ trả về true
-    # ngược lại nếu giá trị đang xét trùng với đề bài thì sẽ trả về false
+    # ngược lại nếu giá trị đang xét k trùng với đề bài thì sẽ trả về false
+
     def isRowDuplicate(self, row, value):
         for column in range(0, NumDigits):
             if(self.values[row][column] == value):
@@ -288,7 +298,7 @@ class originalComparison(Candidate):
             return False
 
 
-# class choiceParents, cho ra 2 cá thể để lai ghép với nhau
+# class choiceParents, cho ra cá thể để lai ghép
 class choiceParents(object):
     """ The crossover function requires two parents to be selected from the population pool. The choiceParents class is used to do this.
 
@@ -313,12 +323,10 @@ class choiceParents(object):
             fittest = c2
             weakest = c1
 
-        selection_rate = 0.85
+        selection_rate = 0.2
         # nếu mà r > 0.85 thì cá thể có chỉ số fitness cao sẽ được chọn
         # ngược lại r < 0.85 thì cả thể có chỉ số fitness thấp sẽ được chọn
-        r = random.uniform(0, 1.1)
-        while(r > 1):
-            r = random.uniform(0, 1.1)
+        r = random.uniform(0, 1)
         if(r < selection_rate):
             return fittest
         else:
@@ -332,6 +340,7 @@ class CycleCrossover(object):
     def __init__(self):
         return
 
+    # lai
     def crossover(self, parent1, parent2, crossoverRate):
         # khởi tạo 2 thế hệ con
         child1 = Candidate()
@@ -350,11 +359,12 @@ class CycleCrossover(object):
         # bắt đầu lai chéo
         if (r < crossoverRate):
             # chọn điểm giao nhau, ít nhất 1 hàng và nhiều nhất là NumDigits - 1 hàng
-            crossoverPoint1 = random.randint(0, 8)
-            crossoverPoint2 = random.randint(1, 9)
+            crossoverPoint1 = random.randint(0, NumDigits - 1)
+            crossoverPoint2 = random.randint(0, NumDigits - 1)
+
             while(crossoverPoint1 == crossoverPoint2):
-                crossoverPoint1 = random.randint(0, 8)
-                crossoverPoint2 = random.randint(1, 9)
+                crossoverPoint1 = random.randint(0, NumDigits - 1)
+                crossoverPoint2 = random.randint(0, NumDigits - 1)
 
             # crossoverPoint1 luôn luôn < crossoverPoint2
             if(crossoverPoint1 > crossoverPoint2):
@@ -363,11 +373,31 @@ class CycleCrossover(object):
                 crossoverPoint2 = temp
 
             # mỗi lần lặp là sẽ đổi 1 hàng bên child1 với 1 hàng bên child2
-            for i in range(crossoverPoint1, crossoverPoint2):
+            for i in range(crossoverPoint1, crossoverPoint2 + 1):
                 child1.values[i], child2.values[i] = self.crossoverRows(
                     child1.values[i], child2.values[i])
+            #     print("\nparent 1, hàng : ",
+            #           parent1.values[i], i, "----  parent 2, hàng: ", parent2.values[i], i)
+            #     print("\ncon    1, hàng : ",
+            #           child1.values[i], i, "----  con    2, hàng: ", child2.values[i], i)
+
+            # print("\n----------")
 
         return child1, child2
+
+    def swap2row(self, row, row2):
+        return row2, row
+
+    def swap2value(self, row, row2):
+        childRow1 = row
+        childRow2 = row2
+        childRow1[0] = row2[0]
+        childRow1[1] = row2[1]
+
+        childRow2[0] = row[0]
+        childRow2[1] = row[1]
+
+        return childRow1, childRow2
 
     # tiến hành hoán đổi giá trị 2 bên dựa vào vị trí đã chọn trong hàm crossover
 
@@ -379,64 +409,59 @@ class CycleCrossover(object):
         # tạo mảng remaining, có giá trị từ 1 -> NumDigits
         remaining = [i for i in range(1, NumDigits+1)]
 
-        cycle = 0
+        cycles = 0
 
         # While child rows not complete...
+        # nếu trong childRow1 và childRow2 còn số 0 thì while chưa kết thúc
         while((0 in childRow1) and (0 in childRow2)):
-            if(cycle % 2 == 0):  # cycles chẵn
-                # Assign next unused value.
+            if(cycles % 2 == 0):  # cycles chẵn
+                # Chỉ định giá trị không sử dụng tiếp theo.
                 index = self.findUnused(row, remaining)
-                start = row[index]
-                remaining.remove(row[index])
                 childRow1[index] = row[index]
                 childRow2[index] = row2[index]
+                remaining.remove(row[index])
+                start = row[index]
                 next = row2[index]
 
-                while(next != start):  # While cycle not done...
+                while(next != start):  # While cycles not done...
                     index = self.findValue(row, next)
                     childRow1[index] = row[index]
-                    remaining.remove(row[index])
                     childRow2[index] = row2[index]
+                    remaining.remove(row[index])
                     next = row2[index]
 
-                cycle += 1
+                cycles += 1
 
-            else:  # cycle lẻ - flip values.
+            else:  # cycles lẻ - flip values.
                 index = self.findUnused(row, remaining)
-                start = row[index]
-                remaining.remove(row[index])
                 childRow1[index] = row2[index]
                 childRow2[index] = row[index]
+                remaining.remove(row[index])
+                start = row[index]
                 next = row2[index]
 
-                while(next != start):  # While cycle not done...
+                while(next != start):  # While cycles not done...
                     index = self.findValue(row, next)
                     childRow1[index] = row2[index]
-                    remaining.remove(row[index])
                     childRow2[index] = row[index]
+                    remaining.remove(row[index])
                     next = row2[index]
 
-                cycle += 1
-        # print("\ncon 1: ", childRow1)
-        # print("\ncon 2: ", childRow2)
+                cycles += 1
 
         return childRow1, childRow2
 
+    # tìm giá trị không sử dụng
     def findUnused(self, parent_row, remaining):
         for i in range(0, len(parent_row)):
             if(parent_row[i] in remaining):
                 return i
 
+    # tìm vị trí giá trị
     def findValue(self, parent_row, value):
         for i in range(0, len(parent_row)):
             if(parent_row[i] == value):
                 return i
-
-    def swap2row(self, row, row2):
-        temp = row
-        row = row2
-        row2 = temp
-        return row, row2
 
 
 class Sudoku(object):
@@ -474,17 +499,19 @@ class Sudoku(object):
         mutationRate = 0.5  # tỉ lệ đột biến
 
         # quần thể ban đầu or tạo ra giống mới
+        # khởi tạo quần thể
         self.population = Population()
+        # tạo tới dân số
         self.population.seed(size, self.original_Comparison)
 
-        # cho phép lặp 1000 thế hệ
+        # cho phép lặp 999 thế hệ
         for generation in range(0, NumGeneration):
             print("Generation %d" % generation)
 
             # kiểm tra giải pháp
             bestFitness = 0.0
             bestSolution = self.original_Comparison
-            # cho mỗi thế hệ, duyệt qua tất cả các ứng cử viên hoặc nhiễm sắc thể để kiểm tra giải pháp
+            # cho mỗi thế hệ, duyệt qua tất cả các cá thể
             for c in range(0, size):
                 fitness = self.population.candidates[c].fitness
                 if(int(fitness) == 1):
@@ -526,7 +553,8 @@ class Sudoku(object):
                 # đột biến child1.
                 child1.updateFitness()
                 oldFitness = child1.fitness
-                success = child1.mutate(mutationRate, self.original_Comparison)
+                success = child1.mutate(
+                    mutationRate, self.original_Comparison)
                 child1.updateFitness()
                 if(success):
                     NumMutate += 1
@@ -537,7 +565,8 @@ class Sudoku(object):
                 # đột biến child2.
                 child2.updateFitness()
                 oldFitness = child2.fitness
-                success = child2.mutate(mutationRate, self.original_Comparison)
+                success = child2.mutate(
+                    mutationRate, self.original_Comparison)
                 child2.updateFitness()
                 if(success):
                     NumMutate += 1
@@ -548,14 +577,13 @@ class Sudoku(object):
                 # Thêm trẻ em vào dân số mới.
                 nextPopulation.append(child1)
                 nextPopulation.append(child2)
-
             # Thêm giới tinh hoa vào phần cuối của dân số. Chúng sẽ không bị ảnh hưởng bởi sự trao đổi chéo hoặc đột biến.
             for e in range(0, sizeElite):
                 nextPopulation.append(elites[e])
 
             # Chọn thế hệ tiếp theo.
             self.population.candidates = nextPopulation
-            self.population.updateFitness()
+            self.population.updateFitnessAll()
 
             # Tính tỷ lệ đột biến thích nghi mới (dựa trên quy tắc thành công 1/5 của Rechenberg). Điều này nhằm ngăn chặn quá nhiều đột biến khi thể lực tiến dần đến sự thống nhất.
             if(NumMutate == 0):
@@ -602,7 +630,7 @@ class Sudoku(object):
 
 
 s = Sudoku()
-s.load("easy.txt")
+s.load("easy2.txt")
 solution = s.solve()
 if(solution):
     s.save("solution.txt", solution)

@@ -61,3 +61,5 @@ yêu cầu để tìm hiểu bài toán
 6. lớp sudoku
     - hiểu được cách hoạt động của lớp để xử lý bài toán sudoku
      
+
+- ta có thể bỏ bớt 1 trong 2 yếu tố đột biến và lai ghép, chương trình vẫn chạy ra kết quả 

@@ -1,0 +1,96 @@
+mô tả cách lai:
+	-  lai giữa 2 hàng parent
+	- khởi tạo 2 child là 1 mảng 9 phần tử rỗng
+	- tạo mảng remaining từ 1 tới 9 để đánh dấu các phần tử nào đã xuất hiện (phần tử nào xuất hiện thì remove ra khỏi mảng)
+	- tạo biến cycle để theo dõi chu kì 
+	- tiến hành lặp. dk lặp là khi nào child còn số 0 trong mảng thì chưa kết thúc
+		+ if chu kì chẵn
+			++ gọi hàm findUnused để tìm vị trí trong row parent có giá trị trong mảng remaining
+			++ tiến hành gán cho child1 = row1 và child2 = row2 ở vị trí mới tìm dc
+			++ xóa giá trị đó trong mảng remaining đi
+			++gán vào biến start = row1[]ở vị trí mới tìm dc
+			++gán vào biến next = row2[]ở vị trí mới tìm dc
+
+			++ nếu mà next != start thì tiến hành làm tương tự các bước trên cho tới khi next = start
+---> thực tế nếu mà next != start thì có nghĩa là đã có sự khác biệt giữa child và parent
+
+		+ tương tự với chu trình chẵn, ta chỉ cần chú ý thay đổi child1 = row2 và child2 = row1 và các bước khác tương tự như vậy
+
+
+các hàm hỗ trợ cho thuật toán
+	- hàm findUnused 
+		+ duyệt lần lượt các giá trị có trong parent cho tới khi tìm được giá trị có trong mảng remaining và trả về vị trí
+
+
+row 	[1 5 4 9 6 2 8 3 7]
+row2 	[1 4 7 9 6 2 8 3 5] 
+remaining  [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+lặp lần 1
+cycle = 0
+-> do cycle cHẴN chạy phần if 
+ findUnused return 0
+
+index = 0
+start = 1
+remaining.remove -> còn [2, 3, 4, 5, 6, 7, 8, 9]
+childRow1[0] = row[0] = 1  -> childRow1 = [1 0 0 0 0 0 0 0 0]
+childRow2[0] = row2[0] = 1 -> childRow2 = [1 0 0 0 0 0 0 0 0]
+next = 1
+
+next == start == 1 -> while k chạy
+
+cycle += 1
+
+lặp lần 2
+row 	[1 5 4 9 6 2 8 3 7]
+row2 	[1 4 7 9 6 2 8 3 5] 
+remaining  [2, 3, 4, 5, 6, 7, 8, 9]
+-> do cycle lẻ chạy phần else 
+
+ findUnused return 1
+
+index = 1
+remaining.remove -> còn [2, 3, 4, 6, 7, 8, 9] 
+childRow1[1] = row2[1] 	= 4  -> 	childRow1 = [1 4 0 0 0 0 0 0 0]
+childRow2[1] = row[1] 	= 5  -> 	childRow2 = [1 5 0 0 0 0 0 0 0]
+start = 5
+next = 4
+
+while (next = 4 != 5 )
+	index = findvalue(row, next) = 2
+	childRow1[2] = row2[2] 	= 7 -> 		childRow1 = [1 4 7 0 0 0 0 0 0]
+	childRow2[2] = row[2] 	= 4  -> 	childRow2 = [1 5 4 0 0 0 0 0 0]
+	remaining.remove -> còn [2, 3, 6, 7, 8, 9]
+	next = 7
+
+
+	index = findvalue(row, next) = 8
+	childRow1[8] = row2[8] 	= 5 -> 		childRow1 = [1 4 7 0 0 0 0 0 5]
+	childRow2[8] = row[8] 	= 8  -> 	childRow2 = [1 5 4 0 0 0 0 0 8]
+	remaining.remove -> còn [2, 3, 6, 7, 9]
+	next = 5
+
+
+
+cycle = 2
+
+lặp lần 3
+		
+row 	[1 5 4 9 6 2 8 3 7]
+row2 	[1 4 7 9 6 2 8 3 5] 
+remaining  [2, 3, 6, 7, 9]
+
+-> do cycle chẵn chạy phần if 
+
+ findUnused return 3
+
+index = 1
+remaining.remove -> còn [2, 3, 4, 6, 7, 8, 9] 
+childRow1[3] = row[3] 	= 9  -> 	childRow1 = [1 4 7 9 0 0 0 0 5]
+childRow2[3] = row2[3] 	= 9  -> 	childRow2 = [1 5 4 9 0 0 0 0 8]
+start = 9
+next = 9
+
+cycle
+
